@@ -173,7 +173,7 @@ def evaluate_model(model, traingen, validgen, testgen):
 if not "valid_inputs_received" in st.session_state:
     st.session_state["valid_inputs_received"] = False
 
-logo_url = 'images/boatexpertlogo.png'
+logo_url = 'images/boatexpertlogo_new.png'
 st.sidebar.image(logo_url)
 st.sidebar.write("")
 st.sidebar.button("Reset", type="primary")
