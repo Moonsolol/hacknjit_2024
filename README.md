@@ -15,4 +15,6 @@ Streamlit, Tensorflow, Keras, Pandas
 
 Install all required packages with 'pip install -r requirements.txt'
 
+Run with 'streamlit run main_app.py'
+
 Logo was made personally in MS Paint 3D
