@@ -218,6 +218,9 @@ with MainTab:
         st.success('Done!')
     elif st.sidebar.button('Use the supplied pre-trained model'):
         model = tf.keras.models.load_model('saved_model.h5')
-        evaluate_model(model, train_set, valid_set, test_set)
+        with st.spinner('Testing model... (may take a while, please wait)'):
+            evaluate_model(model, train_set, valid_set, test_set)
+        st.success('Done!')
     else:
-        st.write("Choose an option from the sidebar")
+        st.write("Choose an option from the sidebar!")
+        st.write("Recommended to use the pre-trained model, training takes a very long time.")
