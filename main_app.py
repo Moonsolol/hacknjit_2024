@@ -12,6 +12,25 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D, BatchNormalization
 from keras.preprocessing.image import ImageDataGenerator
 
+st.set_page_config(
+    layout="centered", 
+    page_title="BoatExpert"
+)
+
+st.markdown(
+    """
+    <style>
+        [data-testid=stSidebar] [data-testid=stImage]{
+            text-align: center;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+    </style>
+    """, unsafe_allow_html=True
+)
+
 class CustomCallback(keras.callbacks.Callback):
     def on_train_begin(self, logs=None):
         st.write("Starting training")
@@ -151,33 +170,42 @@ def evaluate_model(model, traingen, validgen, testgen):
     st.write("Test Accuracy:", test_score[1])
     st.write('-' * 20)
 
-st.set_page_config(
-    layout="centered", 
-    page_title="HackNJIT 2024 Project"
-)
-
 if not "valid_inputs_received" in st.session_state:
     st.session_state["valid_inputs_received"] = False
 
+logo_url = 'images/boatexpertlogo.png'
+st.sidebar.image(logo_url)
 st.sidebar.write("")
 st.sidebar.button("Reset", type="primary")
 
 MainTab, AboutTab = st.tabs(["Main", "About"])
 
 with AboutTab:
-    st.title('HackNJIT 2024 Project')
+    st.title('BoatExpert - A HackNJIT 2024 Project')
     st.subheader('by Terry Su')
     st.markdown(
         """
-        
-        <br><br/>
-        Test
+        This is a boat classifier that categorizes boat images into 9 different types:
+        - Buoy
+        - Cruise Ship
+        - Ferry Boat
+        - Freight Boat
+        - Gondola
+        - Inflatable Boat
+        - Kayak
+        - Paper Boat
+        - Sailboat
+
+        A sequential Keras deep learning model is trained and used to classify boat images.
+        A pre-trained model is available a the link below for fast use, as it takes a long time to train a model.
+
 
         """
     )
 
 with MainTab:
-    st.title('HackNJIT 2024 Project - Main Page')
+    st.title('BoatExpert')
+    uploaded_file = None
     with st.spinner('Preparing data...'):
         train_set, valid_set, test_set= augment_dataset()
     if st.sidebar.button('Train model from scratch'):
@@ -188,13 +216,13 @@ with MainTab:
         st.success('Done!')
     elif st.sidebar.button('Upload a pre-trained model'):
         #model = tf.keras.models.load_model('saved_model.h5')
-        uploaded_file = st.file_uploader("Choose a h5 or keras model file")
-        if uploaded_file is not None:
-            model = uploaded_file
-            st.write('')
-            if st.button('Test model'):
-                with st.spinner('Testing model...'):
-                    evaluate_model(model, train_set, valid_set, test_set)
-                st.success('Done!')
+        uploaded_file = st.file_uploader("Choose a h5 or keras model file",
+            type=['h5', 'keras'])
     else:
         st.write("Choose an option from the sidebar")
+    if st.button('Test Model'):
+            if uploaded_file is not None:
+                st.write('Test')
+                evaluate_model(uploaded_file, train_set, valid_set, test_set)
+            else:
+                st.write('Please upload a file first.')
