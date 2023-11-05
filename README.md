@@ -13,4 +13,6 @@ Pre-trained model for testing use: https://drive.google.com/file/d/10xUDOr7F8P24
 Packages/Tools used (requirements.txt contains detailed package info):
 Streamlit, Tensorflow, Keras, Pandas
 
+Install all required packages with 'pip install -r requirements.txt'
+
 Logo was made personally in MS Paint 3D
