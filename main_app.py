@@ -101,29 +101,14 @@ def augment_dataset():
     testgen = datagen.flow_from_dataframe(
         dataframe=test_df,
         x_col='images',
-        y_col=None,
+        y_col='labels',
         target_size=(150,150),
-        class_mode=None,
+        class_mode='categorical',
         color_mode='rgb',
         shuffle=True,
         batch_size=b_size
     )
-
-    # gendict = traingen.class_indices
-    # classes = list(gendict.keys())
-    # imgs, lbls = next(traingen)
-    # plt.figure(figsize=(20,20))
-    # for i in range(b_size):
-    #     plt.subplot(5, 5, i + 1)
-    #     image = imgs[i]/255
-    #     plt.imshow(image)
-    #     index = np.argmax(lbls[i])
-    #     class_name=classes[index]
-    #     plt.title(class_name, color='blue',fontsize=12)
-    #     plt.axis='off'
-    # st.write('Sample of Augmented Dataset with Labels')
-    # st.pyplot(plt)
-    return traingen, validgen, testgen, test_df
+    return traingen, validgen, testgen
 
 def train_model(traingen, validgen):
     model = Sequential([
@@ -151,8 +136,7 @@ def train_model(traingen, validgen):
     model.save("saved_model.h5")
     return model
 
-def evaluate_model(model, traingen, validgen, testgen, testdf):
-    STEP_SIZE_TEST=len(testgen)//testgen.batch_size
+def evaluate_model(model, traingen, validgen, testgen):
     train_score = model.evaluate(traingen, verbose=1)
     valid_score = model.evaluate(validgen, verbose=1)
     test_score = model.evaluate(testgen, verbose=1)
@@ -166,15 +150,6 @@ def evaluate_model(model, traingen, validgen, testgen, testdf):
     st.write("Test Loss:", test_score[0])
     st.write("Test Accuracy:", test_score[1])
     st.write('-' * 20)
-    
-
-    # STEP_SIZE_VALID=validgen.n//validgen.batch_size
-    # STEP_SIZE_TEST=testgen.n//testgen.batch_size
-    # model.evaluate_generator(generator=validgen, steps=STEP_SIZE_TEST)
-    # testgen.reset()
-    # pred = model.predict_generator(testgen, steps=STEP_SIZE_TEST, verbose=1)
-    # predicted_class_indices=np.argmax(pred,axis=1)
-    # return predicted_class_indices
 
 st.set_page_config(
     layout="centered", 
@@ -203,11 +178,23 @@ with AboutTab:
 
 with MainTab:
     st.title('HackNJIT 2024 Project - Main Page')
-    train_set, valid_set, test_set, test_df = augment_dataset()
+    with st.spinner('Preparing data...'):
+        train_set, valid_set, test_set= augment_dataset()
     if st.sidebar.button('Train model from scratch'):
-        model = train_model(train_set, valid_set)
-    elif st.sidebar.button('Test pre-trained model'):
-        model = tf.keras.models.load_model('saved_model.h5')
-        evaluate_model(model, train_set, valid_set, test_set, test_df)
+        with st.spinner('Training model... (might take a few hours)'):
+            model = train_model(train_set, valid_set)
+        with st.spinner('Testing model...'):
+            evaluate_model(model, train_set, valid_set, test_set)
+        st.success('Done!')
+    elif st.sidebar.button('Upload a pre-trained model'):
+        #model = tf.keras.models.load_model('saved_model.h5')
+        uploaded_file = st.file_uploader("Choose a h5 or keras model file")
+        if uploaded_file is not None:
+            model = uploaded_file
+            st.write('')
+            if st.button('Test model'):
+                with st.spinner('Testing model...'):
+                    evaluate_model(model, train_set, valid_set, test_set)
+                st.success('Done!')
     else:
         st.write("Choose an option from the sidebar")
