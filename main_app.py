@@ -196,10 +196,12 @@ with AboutTab:
         - Paper Boat
         - Sailboat
 
+        The dataset used to train this model was found at: https://www.kaggle.com/datasets/clorichel/boat-types-recognition
+
         A sequential Keras deep learning model is trained and used to classify boat images.
         A pre-trained model is available a the link below for fast use, as it takes a long time to train a model.
 
-
+        Pre-trained Model: https://drive.google.com/file/d/10xUDOr7F8P24fBgUK3gsFfQWIlUZFQ6V/view?usp=sharing
         """
     )
 
@@ -214,15 +216,8 @@ with MainTab:
         with st.spinner('Testing model...'):
             evaluate_model(model, train_set, valid_set, test_set)
         st.success('Done!')
-    elif st.sidebar.button('Upload a pre-trained model'):
-        #model = tf.keras.models.load_model('saved_model.h5')
-        uploaded_file = st.file_uploader("Choose a h5 or keras model file",
-            type=['h5', 'keras'])
+    elif st.sidebar.button('Use the supplied pre-trained model'):
+        model = tf.keras.models.load_model('saved_model.h5')
+        evaluate_model(model, train_set, valid_set, test_set)
     else:
         st.write("Choose an option from the sidebar")
-    if st.button('Test Model'):
-            if uploaded_file is not None:
-                st.write('Test')
-                evaluate_model(uploaded_file, train_set, valid_set, test_set)
-            else:
-                st.write('Please upload a file first.')
